@@ -25,18 +25,18 @@ Function Convert-FileSystem
     $acl = Get-ACL -Literalpath $Path
     $currentSDDL = $acl.Sddl
     $sddlOwner = $currentSDDL -replace $sddlFormat, '$1'
-    if ($SIDhistoryTranslate.keys -contains $sddlOwner)
+    if ($TranslationTable.keys -contains $sddlOwner)
     {
       $ChangedACL = $true
       Write-Verbose "Changing owner on $Path"
-      $sddlOwner = $SIDhistoryTranslate[$sddlOwner]
+      $sddlOwner = $TranslationTable[$sddlOwner]
     }
     $sddlGroup =  $currentSDDL -replace $sddlFormat, '$2'
-    if ($SIDhistoryTranslate.keys -contains $sddlGroup)
+    if ($TranslationTable.keys -contains $sddlGroup)
     {
       $ChangedACL = $true
       Write-Verbose "Changing group on $Path"
-      $sddlGroup = $SIDhistoryTranslate[$sddlGroup]
+      $sddlGroup = $TranslationTable[$sddlGroup]
     }
     $sddlACLProtected =  $currentSDDL -replace $sddlFormat, '$3'
     $newSDDL= "O:$($sddlOwner)G:$($sddlGroup)D:$($sddlACLProtected)"
@@ -48,13 +48,13 @@ Function Convert-FileSystem
       }
       if ($ace -match $aceFormat)
       {
-        if ($global:SIDhistoryTranslate.keys -contains $Matches[6] -and $Matches[2] -notlike '*ID*')
+        if ($TranslationTable.keys -contains $Matches[6] -and $Matches[2] -notlike '*ID*')
         {
           $ChangedACL = $true
           Write-Verbose "Modifying ACE entry on $Path"
           Write-Verbose "From:`t($($ace -replace '\(?(.*?)\)?','$1'))"
-          Write-Verbose "To:`t($($ace -replace '\(?(.*;)[A-Z0-9-]*\)?','$1')$($global:SIDhistoryTranslate[$Matches[6]]))"
-          "($($ace -replace '\(?(.*;)[A-Z0-9-]*\)?','$1')$($global:SIDhistoryTranslate[$Matches[6]]))"
+          Write-Verbose "To:`t($($ace -replace '\(?(.*;)[A-Z0-9-]*\)?','$1')$($TranslationTable[$Matches[6]]))"
+          "($($ace -replace '\(?(.*;)[A-Z0-9-]*\)?','$1')$($TranslationTable[$Matches[6]]))"
         }
         elseif ($SaveOld -eq $false)
         {
