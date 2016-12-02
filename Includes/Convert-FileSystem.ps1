@@ -72,6 +72,6 @@ Function Convert-FileSystem
       Write-Host '[DONE]'
     }
 #Recursive parts
-    Get-ChildItem -Directory $Path -PipelineVariable ChildDirs | % {Convert-SHRFileSystem -Path $ChildDirs.FullName -Recurse:$Recurse -SaveOld:$SaveOld}
+    Get-ChildItem -Directory $Path -PipelineVariable ChildDirs | %  {& $($MyInvocation.MyCommand.Name) -Path $ChildDirs.FullName -Recurse:$Recurse -SaveOld:$SaveOld}
   }
 }
