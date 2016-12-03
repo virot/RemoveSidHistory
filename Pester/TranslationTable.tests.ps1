@@ -1,7 +1,7 @@
 Import-Module "$(Split-Path -Parent $MyInvocation.MyCommand.Path)\..\RemoveSidHistory.psd1"
 
 Describe "TranslationTable" {
-    It "Add simple TranslationTable things" {
+    It "Basic simple TranslationTable things" {
          Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'
          Add-TranslationTableEntry -SourceSID 'S-1-0-0' -DestinationSID 'DA'
          Add-TranslationTableEntry -SourceSID 'S-1-5-21-1-2-3-4' -DestinationSID 'AU'
@@ -10,6 +10,10 @@ Describe "TranslationTable" {
          (Get-TranslationTable)['DU'] | Should Be $Null
          (Get-TranslationTable).ContainsKey('BU') | Should Be $True
          (Get-TranslationTable).ContainsKey('DU') | Should Be $False
+         (Get-TranslationTable).ContainsKey('S-1-0-0') | Should Be $True
+         Remove-TranslationTableEntry -Source 'S-1-0-0'
+         (Get-TranslationTable).ContainsKey('S-1-0-0') | Should Be $False
+
     }
     It "Clear TranslationTable" {
          Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'
@@ -20,12 +24,13 @@ Describe "TranslationTable" {
          (Get-TranslationTable).Count | Should Be '0'
     }
     It "Export TranslationTable" {
+         Clear-TranslationTable
          Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'
          Add-TranslationTableEntry -SourceSID 'S-1-0-0' -DestinationSID 'DA'
          Add-TranslationTableEntry -SourceSID 'S-1-5-21-1-2-3-4' -DestinationSID 'AU'
          $tempfile = [system.io.path]::GetTempFileName()
          Export-TranslationTable -Path $tempfile
-         (Get-FileHash $tempfile -Algorithm SHA1).Hash | Should Be '1827D705FFFBD8D3CCFF20D514A38FAE6F8BA48F'
+         (Get-FileHash $tempfile -Algorithm SHA1).Hash | Should Be 'C6349F2A72774BE241AC860BB75F85ABBEB1AEDB'
          Remove-Item $tempfile
     }
     It "Import TranslationTable" {
