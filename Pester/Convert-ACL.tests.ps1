@@ -1,4 +1,4 @@
-. ..\..\Includes\Convert-ACL.ps1
+. "$(Split-Path -Parent $MyInvocation.MyCommand.Path)\..\Includes\Convert-ACL.ps1"
 $TranslationTable = @{}
 $TranslationTable.Add('BU','DU')
 $TranslationTable.Add('S-1-0-0','DA')
