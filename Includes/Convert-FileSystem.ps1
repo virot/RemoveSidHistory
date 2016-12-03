@@ -11,59 +11,37 @@ Function Convert-FileSystem
     [switch]
     $Recurse,
     [switch]
-    $SaveOld
+    $SaveOld,
+    [switch]
+    $ChangeOwner,
+    [string]
+    [ValidateScript({if ($_ -inotmatch $RemoveSidHistorySIDRegEx){Throw 'Incorrect SID format or SDDL SID Name'}else{$true}})]
+    $ForceOwner,
+    [switch]
+    $ChangeGroup,
+    [string]
+    [ValidateScript({if ($_ -inotmatch $RemoveSidHistorySIDRegEx){Throw 'Incorrect SID format or SDDL SID Name'}else{$true}})]
+    $ForceGroup
   )
   Begin
   {
-#Fix so SACL also work
-    $sddlFormat = 'O:([^:]*)G:([^:]*)D:([A-Z]*)(\(.*\))'
-    $aceFormat = '\(?(A|D);([^;]*);([^;]*);([^;]*);([^;]*);([0-9A-Z-]*)\)?'
   }
   Process
   {
-    $ChangedACL = $false
-    $acl = Get-ACL -Literalpath $Path
-    $currentSDDL = $acl.Sddl
-    $sddlOwner = $currentSDDL -replace $sddlFormat, '$1'
-    if ($TranslationTable.keys -contains $sddlOwner)
-    {
-      $ChangedACL = $true
-      Write-Verbose "Changing owner on $Path"
-      $sddlOwner = $TranslationTable[$sddlOwner]
-    }
-    $sddlGroup =  $currentSDDL -replace $sddlFormat, '$2'
-    if ($TranslationTable.keys -contains $sddlGroup)
-    {
-      $ChangedACL = $true
-      Write-Verbose "Changing group on $Path"
-      $sddlGroup = $TranslationTable[$sddlGroup]
-    }
-    $sddlACLProtected =  $currentSDDL -replace $sddlFormat, '$3'
-    $newSDDL= "O:$($sddlOwner)G:$($sddlGroup)D:$($sddlACLProtected)"
-    $newACEs = ForEach ($ace in ($currentSDDL -replace $sddlFormat, '$4' -split '\)\('))
-    {
-      if ($SaveOld)
-      {
-        ($ace -replace "^\(?([^)]*)\)?$",'($1)')
-      }
-      if ($ace -match $aceFormat)
-      {
-        if ($TranslationTable.keys -contains $Matches[6] -and $Matches[2] -notlike '*ID*')
-        {
-          $ChangedACL = $true
-          Write-Verbose "Modifying ACE entry on $Path"
-          Write-Verbose "From:`t($($ace -replace '\(?(.*?)\)?','$1'))"
-          Write-Verbose "To:`t($($ace -replace '\(?(.*;)[A-Z0-9-]*\)?','$1')$($TranslationTable[$Matches[6]]))"
-          "($($ace -replace '\(?(.*;)[A-Z0-9-]*\)?','$1')$($TranslationTable[$Matches[6]]))"
-        }
-        elseif ($SaveOld -eq $false)
-        {
-          ($ace -replace "^\(?([^)]*)\)?$",'($1)')
-        }
-      }
-    }
-    $newSDDL += $newACEs -join ''
-    if ($newSDDL -ne $currentSDDL -and $pscmdlet.ShouldProcess("$path", "Set New ACL") -and $ChangedACL -eq $true)
+    $aclparam = @{}
+    if ($PSBoundParameters.ContainsKey('SwitchOwner')) {$aclparam.add('ChangeOwner',$ChangeOwner)}
+    if ($PSBoundParameters.ContainsKey('ForceOwner')) {$aclparam.add('ForceOwner',$ForceOwner)}
+    if ($PSBoundParameters.ContainsKey('SwitchGroup')) {$aclparam.add('ChangeGroup',$ChangeGroup)}
+    if ($PSBoundParameters.ContainsKey('ForceGroup')) {$aclparam.add('ForceGroup',$ForceGroup)}
+    $currentacl = Get-ACL -Literalpath $Path
+$currentacl.sddl
+#why does Convert-ACL change the $currentacl variable
+    $newacl = Convert-ACL -ACL $currentAcl @aclparam
+$currentacl.sddl
+    $currentacl = Get-ACL -Literalpath $Path
+$newacl.sddl
+
+    if ($currentacl.sddl -ne $newacl.sddl -and $pscmdlet.ShouldProcess("$path", "Set New ACL"))
     {
       Write-Host -NoNewline "Setting ACL on $path"
       $CorrectACL = New-Object System.Security.AccessControl.Directorysecurity 

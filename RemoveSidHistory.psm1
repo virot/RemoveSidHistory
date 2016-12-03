@@ -10,3 +10,4 @@ $script:RemoveSidHistorySIDRegEx = '^(S-1-5-21-[\d]+-[\d]+-[\d]+-[\d]+|S-1-[\d]+
 . "$PSScriptRoot\Includes\Export-TranslationTable.ps1"
 . "$PSScriptRoot\Includes\Import-TranslationTable.ps1"
 . "$PSScriptRoot\Includes\Remove-TranslationTableEntry.ps1"
+. "$PSScriptRoot\Includes\Convert-ACL.ps1"
