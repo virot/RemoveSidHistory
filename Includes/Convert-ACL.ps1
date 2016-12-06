@@ -60,13 +60,9 @@ Function Convert-ACL
 #Update Access
     $newACEs = ForEach ($ace in ($acl.GetSecurityDescriptorSddlForm('Access') -split '(\([^)]*\))' -ne ''))
     {
-      if ($ace -like 'D:*')
-      {
-        $ace
-      }
       if ($ace -match $aceFormat)
       {
-        if ($SaveOld)
+        if ($PSBoundParameters.ContainsKey('SaveOld'))
         {
           $ace
         }
@@ -77,10 +73,14 @@ Function Convert-ACL
           Write-Verbose "To:`t`"$newace`""
           $newace
         }
-        elseif ($SaveOld -eq $false)
+        elseif ($PSBoundParameters.ContainsKey('SaveOld') -eq $false)
         {
           $ace
         }
+      }
+      else
+      {
+        $ace
       }
     }
     $acl.SetSecurityDescriptorSddlForm(($newACEs -join ''),'Access')
