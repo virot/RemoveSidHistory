@@ -32,12 +32,12 @@ Function Convert-ACL
       $sddlOwner = $acl.GetSecurityDescriptorSddlForm('Owner')
       if ($PSBoundParameters.ContainsKey('ForceOwner')) 
       {
-        Write-Verbose "Changing owner from `"$sddlOwner`" to `"O:$ForceOwner`""
+        Write-Verbose (&$DebugMessage "Changing owner from `"$sddlOwner`" to `"O:$ForceOwner`"")
         $sddlOwner = "O:$ForceOwner"
       }
       elseif ($TranslationTable.ContainsKey($sddlOwner -replace '^O:'))
       {  
-        Write-Verbose "Changing owner from `"$sddlOwner`" to `"O:$($TranslationTable[$sddlOwner -replace '^O:'])`""
+        Write-Verbose (&$DebugMessage "Changing owner from `"$sddlOwner`" to `"O:$($TranslationTable[$sddlOwner -replace '^O:'])`"")
         $sddlOwner = "O:$($TranslationTable[$sddlOwner -replace '^O:'])"
       }
       $newacl.SetSecurityDescriptorSddlForm($sddlOwner,'Owner')
@@ -52,12 +52,12 @@ Function Convert-ACL
       $sddlGroup = $acl.GetSecurityDescriptorSddlForm('Group')
       if ($PSBoundParameters.ContainsKey('ForceGroup')) 
       {
-        Write-Verbose "Changing group from `"$sddlgroup`" to `"G:$ForceGroup`""
+        Write-Verbose (&$DebugMessage "Changing group from `"$sddlgroup`" to `"G:$ForceGroup`"")
         $sddlGroup = "G:$($ForceGroup)"
       }
       elseif ($TranslationTable.ContainsKey($sddlGroup -replace '^G:'))
       {  
-        Write-Verbose "Changing group from `"$sddlGroup`" to `"O:$($TranslationTable[$sddlGroup -replace '^G:'])`""
+        Write-Verbose (&$DebugMessage "Changing group from `"$sddlGroup`" to `"O:$($TranslationTable[$sddlGroup -replace '^G:'])`"")
         $sddlGroup = "G:$($TranslationTable[$sddlGroup -replace '^G:'])"
       }
       $newacl.SetSecurityDescriptorSddlForm($sddlGroup,'Group')
@@ -78,8 +78,7 @@ Function Convert-ACL
         if ($TranslationTable.keys -contains $Matches[6] -and $Matches[2] -notlike '*ID*')
         {
           $newace = "($($ace -replace '\((.*;)[A-Z0-9-]*\)','$1')$($TranslationTable[$Matches[6]]))"
-          Write-Verbose "From:`t`"$ace`""
-          Write-Verbose "To:`t`"$newace`""
+          Write-Verbose (&$DebugMessage "Changing ACE from`t`"$ace`" to `t`"$newace`"")
           $newace
         }
         elseif ($PSBoundParameters.ContainsKey('SaveOld') -eq $false)

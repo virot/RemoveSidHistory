@@ -1,8 +1,7 @@
-. "$(Split-Path -Parent $MyInvocation.MyCommand.Path)\..\Includes\Convert-ACL.ps1"
-$TranslationTable = @{}
-$TranslationTable.Add('BU','DU')
-$TranslationTable.Add('S-1-0-0','DA')
-$TranslationTable.Add('S-1-5-21-1-2-3-4','AU')
+Import-Module "$(Split-Path -Parent $MyInvocation.MyCommand.Path)\..\RemoveSidHistory.psd1"
+Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'
+Add-TranslationTableEntry -SourceSID 'S-1-0-0' -DestinationSID 'DA'
+Add-TranslationTableEntry -SourceSID 'S-1-5-21-1-2-3-4' -DestinationSID 'AU'
 
 
 Describe "SDDL ACL Conversions" {
