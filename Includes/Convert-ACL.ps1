@@ -25,6 +25,7 @@ Function Convert-ACL
   }
   Process
   {
+    $newacl = New-Object System.Security.AccessControl.Directorysecurity
 #Update Owner
     if ($PSBoundParameters.ContainsKey('ChangeOwner') -or $PSBoundParameters.ContainsKey('ForceOwner'))
     {
@@ -39,7 +40,11 @@ Function Convert-ACL
         Write-Verbose "Changing owner from `"$sddlOwner`" to `"O:$($TranslationTable[$sddlOwner -replace '^O:'])`""
         $sddlOwner = "O:$($TranslationTable[$sddlOwner -replace '^O:'])"
       }
-      $acl.SetSecurityDescriptorSddlForm($sddlOwner,'Owner')
+      $newacl.SetSecurityDescriptorSddlForm($sddlOwner,'Owner')
+    }
+    else
+    {
+      $newacl.SetSecurityDescriptorSddlForm($acl.GetSecurityDescriptorSddlForm('Owner'),'Owner')
     }
 #Update Group
     if ($PSBoundParameters.ContainsKey('ChangeGroup') -or $PSBoundParameters.ContainsKey('ForceGroup'))
@@ -55,7 +60,11 @@ Function Convert-ACL
         Write-Verbose "Changing group from `"$sddlGroup`" to `"O:$($TranslationTable[$sddlGroup -replace '^G:'])`""
         $sddlGroup = "G:$($TranslationTable[$sddlGroup -replace '^G:'])"
       }
-      $acl.SetSecurityDescriptorSddlForm($sddlGroup,'Group')
+      $newacl.SetSecurityDescriptorSddlForm($sddlGroup,'Group')
+    }
+    else
+    {
+      $newacl.SetSecurityDescriptorSddlForm($acl.GetSecurityDescriptorSddlForm('Group'),'Group')
     }
 #Update Access
     $newACEs = ForEach ($ace in ($acl.GetSecurityDescriptorSddlForm('Access') -split '(\([^)]*\))' -ne ''))
@@ -83,8 +92,8 @@ Function Convert-ACL
         $ace
       }
     }
-    $acl.SetSecurityDescriptorSddlForm(($newACEs -join ''),'Access')
+    $newacl.SetSecurityDescriptorSddlForm(($newACEs -join ''),'Access')
 #Update Audit
-    Return $ACL
+    Return $newacl
   }
 }

@@ -32,18 +32,12 @@ Function Convert-FileSystem
     $SendAlongParam.Remove('Recurse')|Out-Null
     $SendAlongParam.Remove('Path')|Out-Null
     $currentacl = Get-ACL -Literalpath $Path
-$currentacl.sddl
-#why does Convert-ACL change the $currentacl variable
     $newacl = Convert-ACL -ACL $currentAcl @SendAlongParam
-$currentacl.sddl
-    $currentacl = Get-ACL -Literalpath $Path
-$newacl.sddl
-
     if ($currentacl.sddl -ne $newacl.sddl -and $pscmdlet.ShouldProcess("$path", "Set New ACL"))
     {
-      Write-Host -NoNewline "Setting ACL on $path"
+      Write-Verbose (&$DebugMessage "Starting to set ACL on $path")
       Set-ACL -LiteralPath $Path  -AclObject $newacl
-      Write-Host ' [DONE]'
+      Write-Verbose (&$DebugMessage "Completed to set ACL on $path")
     }
 #Recursive parts
     if ($PSBoundParameters.ContainsKey('Recurse'))
