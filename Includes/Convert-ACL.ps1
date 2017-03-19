@@ -32,7 +32,7 @@ Function Convert-ACL
       $sddlOwner = $acl.GetSecurityDescriptorSddlForm('Owner')
       if ($PSBoundParameters.ContainsKey('ForceOwner')) 
       {
-        Write-Verbose (&$DebugMessage "Changing owner from `"$sddlOwner`" to `"O:$ForceOwner`"")
+        Write-Verbose (&$DebugMessage "Changing owner from `"$sddlOwner`" to `"O:$ForceOwner`" [Forced]")
         $sddlOwner = "O:$ForceOwner"
       }
       elseif ($TranslationTable.ContainsKey($sddlOwner -replace '^O:'))
@@ -52,12 +52,12 @@ Function Convert-ACL
       $sddlGroup = $acl.GetSecurityDescriptorSddlForm('Group')
       if ($PSBoundParameters.ContainsKey('ForceGroup')) 
       {
-        Write-Verbose (&$DebugMessage "Changing group from `"$sddlgroup`" to `"G:$ForceGroup`"")
+        Write-Verbose (&$DebugMessage "Changing group from `"$sddlgroup`" to `"G:$ForceGroup`" [Forced]")
         $sddlGroup = "G:$($ForceGroup)"
       }
       elseif ($TranslationTable.ContainsKey($sddlGroup -replace '^G:'))
       {  
-        Write-Verbose (&$DebugMessage "Changing group from `"$sddlGroup`" to `"O:$($TranslationTable[$sddlGroup -replace '^G:'])`"")
+        Write-Verbose (&$DebugMessage "Changing group from `"$sddlGroup`" to `"G:$($TranslationTable[$sddlGroup -replace '^G:'])`"")
         $sddlGroup = "G:$($TranslationTable[$sddlGroup -replace '^G:'])"
       }
       $newacl.SetSecurityDescriptorSddlForm($sddlGroup,'Group')
