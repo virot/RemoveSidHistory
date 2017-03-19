@@ -10,6 +10,7 @@ Describe "Simple Translation" {
         & 'icacls' "$PesterBaseTestPath" '/grant' '*BU:(CI)(OI)(F)'|Select -Skip 1 | Should BeLike "*Successfully processed 1 files; Failed processing 0 files*"
     }
     It "Setup Translation table for tests" {
+        Clear-TranslationTable
         Add-TranslationTableEntry -SourceSID 'DU' -DestinationSID 'BU'
         Add-TranslationTableEntry -SourceSID 'S-1-0-0' -DestinationSID 'DA'
         Add-TranslationTableEntry -SourceSID 'S-1-5-21-1-2-3-4' -DestinationSID 'S-1-5-21-1-2-3-502'
