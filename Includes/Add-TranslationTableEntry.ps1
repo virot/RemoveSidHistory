@@ -12,7 +12,14 @@ Function Add-TranslationTableEntry
   {
     if ($TranslationTable.ContainsKey($DestinationSID))
     {
-      $TranslationTable[$SourceSID] = $TranslationTable[$DestinationSID]
+      if ($SourceSID -eq $TranslationTable[$DestinationSID])
+      {
+        throw ("Translating `"$SourceSID`" to `"$DestinationSID`" would create a loop.")
+      }
+      else
+      {
+        $TranslationTable[$SourceSID] = $TranslationTable[$DestinationSID]
+      }
     }
     else
     {

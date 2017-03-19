@@ -22,9 +22,28 @@ Describe "TranslationTable" {
          Add-TranslationTableEntry -SourceSID 'DU' -DestinationSID 'DA'
          (Get-TranslationTable).Count | Should Be '2'
          (Get-TranslationTable)['BU'] | Should Be 'DA'
+         (Get-TranslationTable)['DU'] | Should Be 'DA'
          (Get-TranslationTable).ContainsKey('BU') | Should Be $True
          (Get-TranslationTable).ContainsKey('DU') | Should Be $True
          (Get-TranslationTable).ContainsKey('BA') | Should Be $False
+    }
+    It "Verify loop protection" {
+         trap {continue}
+         Clear-TranslationTable
+         Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'
+         Add-TranslationTableEntry -SourceSID 'DU' -DestinationSID 'BU' | Should Throw
+         (Get-TranslationTable).Count | Should Be '1'
+         (Get-TranslationTable)['BU'] | Should Be 'DU'
+         (Get-TranslationTable).ContainsKey('DU') | Should Be $False
+    }
+    It "Verify loop double step protection" {
+         trap {continue}
+         Clear-TranslationTable
+         Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DA'
+         Add-TranslationTableEntry -SourceSID 'DA' -DestinationSID 'DU'
+         Add-TranslationTableEntry -SourceSID 'DU' -DestinationSID 'BU' | Should Throw
+         (Get-TranslationTable).Count | Should Be '2'
+         (Get-TranslationTable).ContainsKey('DU') | Should Be $False
     }
     It "Export TranslationTable" {
          Clear-TranslationTable
