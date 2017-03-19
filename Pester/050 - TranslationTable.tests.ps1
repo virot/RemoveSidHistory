@@ -16,6 +16,16 @@ Describe "TranslationTable" {
          (Get-TranslationTable).ContainsKey('S-1-0-0') | Should Be $False
 
     }
+    It "Verify double steps" {
+         Clear-TranslationTable
+         Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'
+         Add-TranslationTableEntry -SourceSID 'DU' -DestinationSID 'DA'
+         (Get-TranslationTable).Count | Should Be '2'
+         (Get-TranslationTable)['BU'] | Should Be 'DA'
+         (Get-TranslationTable).ContainsKey('BU') | Should Be $True
+         (Get-TranslationTable).ContainsKey('DU') | Should Be $True
+         (Get-TranslationTable).ContainsKey('BA') | Should Be $False
+    }
     It "Export TranslationTable" {
          Clear-TranslationTable
          Add-TranslationTableEntry -SourceSID 'BU' -DestinationSID 'DU'

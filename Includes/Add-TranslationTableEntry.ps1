@@ -10,6 +10,23 @@ Function Add-TranslationTableEntry
   )
   Process
   {
-    $TranslationTable[$SourceSID] = $DestinationSID
+    if ($TranslationTable.ContainsKey($DestinationSID))
+    {
+      $TranslationTable[$SourceSID] = $TranslationTable[$DestinationSID]
+    }
+    else
+    {
+      if ($TranslationTable.ContainsValue($SourceSID))
+      {
+        ForEach ($Key in ($TranslationTable.Keys).clone())
+        {
+          if ($TranslationTable[$Key] -eq $SourceSID)
+          {
+            $TranslationTable[$Key] = $DestinationSID
+          }
+        }
+      }
+      $TranslationTable[$SourceSID] = $DestinationSID
+    }
   }
 }
