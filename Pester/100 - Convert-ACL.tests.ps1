@@ -10,6 +10,11 @@ Describe "SDDL ACL Conversions" {
         $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;0x1200a9;;;BU)','All')
         (Convert-ACL $acl).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:PAI(A;OICI;0x1200a9;;;DU)'
     }
+    It "outputs 'Change S-1-5-32-544->BA (Due to way of scripts)'" {
+        $acl = New-Object System.Security.AccessControl.Directorysecurity
+        $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;0x1200a9;;;S-1-5-32-544)','All')
+        (Convert-ACL $acl).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:PAI(A;OICI;0x1200a9;;;BA)'
+    }
     It "outputs 'ForceOwner to Everyone'" {
         $acl = New-Object System.Security.AccessControl.Directorysecurity
         $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;0x1200a9;;;BU)','All')
