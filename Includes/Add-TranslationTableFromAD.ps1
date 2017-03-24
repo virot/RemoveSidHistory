@@ -7,8 +7,7 @@ Function Add-TranslationTableFromAD
   $searcher.FindAll() | % {
     ForEach ($SidHistory in ($_.Properties['sidhistory']))
     {
-#      $TranslationTable[(new-object System.Security.Principal.SecurityIdentifier ($_.Properties['objectsid'][0],0)).toString()] = (new-object System.Security.Principal.SecurityIdentifier $SidHistory,0).toString()
-      $TranslationTable[(new-object System.Security.Principal.SecurityIdentifier $SidHistory,0).toString()] = (new-object System.Security.Principal.SecurityIdentifier ($_.Properties['objectsid'][0],0)).toString()
+      Add-TranslationTableEntry -SourceSID (new-object System.Security.Principal.SecurityIdentifier $SidHistory,0).toString() -DestionationSID (new-object System.Security.Principal.SecurityIdentifier ($_.Properties['objectsid'][0],0)).toString()
     }
   }
 }
