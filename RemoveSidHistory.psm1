@@ -11,4 +11,5 @@ $DebugMessage = {Param([string]$Message);"$(get-date -Format 's') [$((Get-Variab
 . "$PSScriptRoot\Includes\Export-TranslationTable.ps1"
 . "$PSScriptRoot\Includes\Import-TranslationTable.ps1"
 . "$PSScriptRoot\Includes\Remove-TranslationTableEntry.ps1"
+. "$PSScriptRoot\Includes\Remove-UnneededExplicitEntries.ps1"
 . "$PSScriptRoot\Includes\Convert-ACL.ps1"
