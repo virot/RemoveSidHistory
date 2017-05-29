@@ -98,5 +98,11 @@ Describe "TranslationTable" {
          Remove-Item $tempfile
     }
 
+    It "Add WellKnown SIDs" {
+         Clear-TranslationTable
+         Add-TranslationTableWellKnownSids -SourceBaseSID 'S-1-5-21-0-0-0' -DestinationBaseSID 'S-1-5-21-1-1-1'
+         (Get-TranslationTable).Count | Should Be '11'
+         (Get-TranslationTable)['S-1-5-21-0-0-0-512'] | Should Be 'S-1-5-21-1-1-1-512'
+    }
 
 }

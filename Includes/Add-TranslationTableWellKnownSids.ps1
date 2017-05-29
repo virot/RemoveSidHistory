@@ -54,7 +54,7 @@ Function Add-TranslationTableWellKnownSids
   {
     ForEach ($rid in $WellKnownRIDs)
     {
-      $TranslationTable["$($SourceBaseSID)-$($rid)"] = "$($DestinationBaseSID)-$($rid)"
+      Add-TranslationTableEntry -SourceSID "$($SourceBaseSID)-$($rid)" -DestinationSID "$($DestinationBaseSID)-$($rid)"
     }
   }
 }
