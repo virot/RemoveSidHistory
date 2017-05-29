@@ -21,6 +21,7 @@ Function Remove-UnneededExplicitEntries
     {
       if ($ImplicitRules -contains ("$($ace.IdentityReference)$($ace.FilesystemRights)$($ace.InheritanceFlags)$($ace.PropagationFlags)$($ace.AccessControlType)"))
       {
+        Write-Verbose "Removing unneeded right for $($ace.IdentityReference)"
         $newacl.RemoveAccessRuleSpecific($ace)
       }
     }
