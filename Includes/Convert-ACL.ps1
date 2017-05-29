@@ -15,7 +15,9 @@ Function Convert-ACL
     $ChangeGroup,
     [string]
     [ValidateScript({if ($_ -inotmatch $RemoveSidHistorySIDRegEx){Throw 'Incorrect SID format or SDDL SID Name'}else{$true}})]
-    $ForceGroup
+    $ForceGroup,
+    [bool]
+    $SaveConvertedACEs = $False
   )
   Begin
   {
@@ -71,17 +73,20 @@ Function Convert-ACL
     {
       if ($ace -match $aceFormat)
       {
-        if ($PSBoundParameters.ContainsKey('SaveOld'))
+        if ($SaveConvertedACEs -eq $True)
         {
           $ace
         }
-        if ($TranslationTable.keys -contains $Matches[6] -and $Matches[2] -notlike '*ID*')
+#Only translate explicit rights removed
+#       if ($TranslationTable.keys -contains $Matches[6] -and $Matches[2] -notlike '*ID*')
+#Translate all rights, required for Remove-UnneededExplicitEntries
+        if ($TranslationTable.keys -contains $Matches[6])
         {
           $newace = "($($ace -replace '\((.*;)[A-Z0-9-]*\)','$1')$($TranslationTable[$Matches[6]]))"
           Write-Verbose (&$DebugMessage "Changing ACE from`t`"$ace`" to `t`"$newace`"")
           $newace
         }
-        elseif ($PSBoundParameters.ContainsKey('SaveOld') -eq $false)
+        elseif ($SaveConvertedACEs -eq $false)
         {
           $ace
         }

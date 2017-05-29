@@ -45,4 +45,19 @@ Describe "SDDL ACL Conversions" {
         $acl.SetSecurityDescriptorSddlForm('O:BUG:BUD:PAI(A;OICI;0x1200a9;;;BU)','All')
         (Convert-ACL $acl).GetSecurityDescriptorSddlForm('Group') | Should Be 'G:BU'
     }
+    It "'Keep changed ACEs if SaveConvertedACEs:$True'" {
+        $acl = New-Object System.Security.AccessControl.Directorysecurity
+        $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;0x1200a9;;;BU)(A;OICI;0x1200a9;;;BA)','All')
+        (Convert-ACL $acl -SaveConvertedACEs:$True).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:PAI(A;OICI;0x1200a9;;;BA)(A;OICI;0x1200a9;;;BU)(A;OICI;0x1200a9;;;DU)'
+    }
+    It "'Remove changed ACEs if SaveConvertedACEs:$False'" {
+        $acl = New-Object System.Security.AccessControl.Directorysecurity
+        $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;0x1200a9;;;BU)(A;OICI;0x1200a9;;;BA)','All')
+        (Convert-ACL $acl -SaveConvertedACEs:$False).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:PAI(A;OICI;0x1200a9;;;BA)(A;OICI;0x1200a9;;;DU)'
+    }
+    It "'Remove double ACEs'" {
+        $acl = New-Object System.Security.AccessControl.Directorysecurity
+        $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;0x1200a9;;;BU)(A;OICI;0x1200a9;;;DU)','All')
+        (Convert-ACL $acl -SaveConvertedACEs:$False).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:PAI(A;OICI;0x1200a9;;;DU)'
+    }
 }

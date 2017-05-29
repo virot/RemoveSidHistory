@@ -21,7 +21,9 @@ Function Convert-FileSystem
     $ChangeGroup,
     [string]
     [ValidateScript({if ($_ -inotmatch $RemoveSidHistorySIDRegEx){Throw 'Incorrect SID format or SDDL SID Name'}else{$true}})]
-    $ForceGroup
+    $ForceGroup,
+    [Bool]
+    $SaveConvertedACEs = $False
   )
   Begin
   {
