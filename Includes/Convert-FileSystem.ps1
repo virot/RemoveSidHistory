@@ -1,3 +1,4 @@
+       
 Function Convert-FileSystem
 {
 [CmdletBinding(SupportsShouldProcess=$true)]
@@ -35,11 +36,15 @@ Function Convert-FileSystem
     $SendAlongParam.Remove('Path')|Out-Null
     $currentacl = Get-ACL -Literalpath $Path
     $newacl = Convert-ACL -ACL $currentAcl @SendAlongParam
-    if ($currentacl.sddl -ne $newacl.sddl -and $pscmdlet.ShouldProcess("$path", "Set New ACL"))
+    if (($currentacl.GetSecurityDescriptorSddlForm('Access') -replace '^[^(]*' -replace "\([^\(]*ID[^\)]*\)",'') -ne ($newacl.GetSecurityDescriptorSddlForm('Access') -replace '^[^(]*' -replace "\([^\(]*ID[^\)]*\)",'') -and $pscmdlet.ShouldProcess("$path", "Set New ACL"))
     {
       Write-Verbose (&$DebugMessage "Starting to set ACL on $path")
       Set-ACL -LiteralPath $Path  -AclObject $newacl
       Write-Verbose (&$DebugMessage "Completed to set ACL on $path")
+    }
+    else
+    {
+      Write-Verbose (&$DebugMessage "ACL correct on $path")
     }
 #Recursive parts
     if ($PSBoundParameters.ContainsKey('Recurse'))
