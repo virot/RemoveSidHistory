@@ -26,4 +26,9 @@ Describe "SDDL ACL Conversions" {
         $acl.SetSecurityDescriptorSddlForm('O:BAG:BAD:PAI(A;OICI;FA;;;BA)(A;OICIID;0x1200a9;;;BA)','All')
         (Remove-UnneededExplicitEntries $acl).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:PAI(A;OICI;FA;;;BA)(A;OICIID;0x1200a9;;;BA)'
     }
+    It "Consider denies'" {
+        $acl = New-Object System.Security.AccessControl.Directorysecurity
+        $acl.SetSecurityDescriptorSddlForm('O:AUG:DUD:AI(A;OICI;0x110000;;;SY)(D;OICIID;0x110000;;;SY)(A;OICIID;0x110000;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;SY)(A;OICIID;0x1200a9;;;BU)(A;ID;0x1301bf;;;AU)(A;OICIIOID;SDGXGWGR;;;AU)','All')
+        (Remove-UnneededExplicitEntries $acl).GetSecurityDescriptorSddlForm('Access') | Should Be 'D:AI(A;OICI;0x110000;;;SY)(D;OICIID;0x110000;;;SY)(A;OICIID;0x110000;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;SY)(A;OICIID;0x1200a9;;;BU)(A;ID;0x1301bf;;;AU)(A;OICIIOID;SDGXGWGR;;;AU)'
+    }
 }
