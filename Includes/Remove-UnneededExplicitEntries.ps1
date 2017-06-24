@@ -11,6 +11,11 @@ Function Remove-UnneededExplicitEntries
   {
     $newacl = New-Object System.Security.AccessControl.Directorysecurity
     $newacl.SetSecurityDescriptorSddlForm($acl.Sddl)
+#If rights contains any DENY permissions just bail. We cannot make sure that we dont fuck things up in that case.
+    if (([array]($acl.GetAccessRules($false, $true, [System.Security.Principal.SecurityIdentifier])|Where-Object {$_.AccessControlType -eq 'Deny'})).count -ge 1)
+    {
+      return $acl
+    } 
 #Create array of text representation as Powershell cant handle all types of FilesystemRights
     $ImplicitRules = ForEach ($ace in ($acl.GetAccessRules($false, $true, [System.Security.Principal.SecurityIdentifier])))
     {
